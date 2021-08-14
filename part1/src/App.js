@@ -14,6 +14,23 @@ const DisplayPerccent = ({good , bad , neutral}) =>{
       </div>
     )
 } 
+const Statistics = ({good, bad ,neutral}) =>{
+  if(good == 0 && bad == 0 && neutral == 0){
+    return <div><strong>No Feedback given</strong></div>
+    
+  }
+    return(
+      <table>
+      <tr><Display number ={good} text = 'Good' /></tr>
+      <tr><Display number ={bad} text = 'Bad' /></tr>
+      <tr><Display number ={neutral} text = 'Neutral' /></tr>
+      <tr><Display number = {(good + bad*-1)/10} text = 'Average'/></tr>
+      <tr><DisplayPerccent good = {good} bad = {bad} neutral = {neutral}/></tr>
+      </table>
+
+    )
+
+}
 
 const App = () => {
   const [good , setGood] = useState(0);
@@ -37,13 +54,7 @@ const App = () => {
       <br/><br/><br/><br/>
 
       <h2>Statistics</h2>
-      <Display number = {good} text = 'Good'/>
-      <Display number = {bad} text = 'bad'/>
-      <Display number = {neutral} text = 'neutral'/>
-      <Display number = {bad + neutral + good} text = 'All'/>
-      <Display number = {(bad*-1 + good)/10} text = 'Average'/>
-      <DisplayPerccent good = {good} bad = {bad} neutral = {neutral}/> 
-
+        <Statistics good = {good} bad = {bad} neutral = {neutral}/>
     </div>
   )  
 }
