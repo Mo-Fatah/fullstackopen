@@ -1,62 +1,52 @@
 import React, { useState } from 'react'
 
-const Button = ({action , text}) =>{
-    return(
-      <button onClick = {action}>{text}</button>
-    )  
-}
+const App = () =>{
 
-const Display = ({number , text}) => <div>{text}s : {number}</div>
-const DisplayPerccent = ({good , bad , neutral}) =>{
-    return (
-      <div>
-        Positive : {(good/(good + bad + neutral))*100} %
-      </div>
-    )
-} 
-const Statistics = ({good, bad ,neutral}) =>{
-  if(good == 0 && bad == 0 && neutral == 0){
-    return <div><strong>No Feedback given</strong></div>
-    
+  const anecdotes = [
+    'If it hurts, do it more often',
+    'Adding manpower to a late software project makes it later!',
+    'The first 90 percent of the code accounts for the first 90 percent of the development time...The remaining 10 percent of the code accounts for the other 90 percent of the development time.',
+    'Any fool can write code that a computer can understand. Good programmers write code that humans can understand.',
+    'Premature optimization is the root of all evil.',
+    'Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.',
+    'Programming without an extremely heavy use of console.log is same as if a doctor would refuse to use x-rays or blood tests when diagnosing patients'
+  ]
+  const [selected , setSelected] = useState(0);
+
+  const points = Array(anecdotes.length).fill(0);
+
+  const [votes , setVotes] = useState(points);
+
+  const largestVotes = Math.max(...votes)
+  const indexOflargest = votes.indexOf(largestVotes);
+
+  const genRandAnecdote = () =>{
+    let x = Math.floor(Math.random()*anecdotes.length)
+    setSelected(x)
   }
-    return(
-      <table>
-      <tr><Display number ={good} text = 'Good' /></tr>
-      <tr><Display number ={bad} text = 'Bad' /></tr>
-      <tr><Display number ={neutral} text = 'Neutral' /></tr>
-      <tr><Display number = {(good + bad*-1)/10} text = 'Average'/></tr>
-      <tr><DisplayPerccent good = {good} bad = {bad} neutral = {neutral}/></tr>
-      </table>
 
-    )
-
-}
-
-const App = () => {
-  const [good , setGood] = useState(0);
-  const [bad , setBad] = useState(0);
-  const [neutral, setNeutral] = useState(0);
-
-  const goodClicked = () => setGood(good +1)
-  const badClicked = () => setBad(bad +1 )
-  const neutralClicked = () => setNeutral(neutral+1)
-
-
-
-
+  const handleVote = () =>{
+    const copy = [...votes];
+    copy[selected] += 1;
+    setVotes(copy);
+  }
+   
   return(
     <div>
-      <h1>Give Feedback</h1>
-      <Button action = {goodClicked} text = 'Good' />
-      <Button action = {badClicked} text = 'bad' />
-      <Button action = {neutralClicked} text = 'neutral' />
+      <h2>Anecdote of the day</h2>
+      <p>{anecdotes[selected]}</p>
+      <p>this Anecdote has {votes[selected]} votes </p>
 
-      <br/><br/><br/><br/>
+      <br/><br/>
+      <button onClick = {handleVote}>vote</button>
+      <button onClick= {genRandAnecdote}>next Andecdote</button>
 
-      <h2>Statistics</h2>
-        <Statistics good = {good} bad = {bad} neutral = {neutral}/>
+      <br/><br/>
+      <h2>Anecdote with the most votes : </h2>
+      <p>{anecdotes[indexOflargest]}</p>
+      <p>it has {largestVotes} votes</p>
     </div>
-  )  
+  )
 }
 
 export default App
