@@ -7,6 +7,13 @@ const Button = ({action , text}) =>{
 }
 
 const Display = ({number , text}) => <div>{text}s : {number}</div>
+const DisplayPerccent = ({good , bad , neutral}) =>{
+    return (
+      <div>
+        Positive : {(good/(good + bad + neutral))*100} %
+      </div>
+    )
+} 
 
 const App = () => {
   const [good , setGood] = useState(0);
@@ -26,11 +33,17 @@ const App = () => {
       <Button action = {goodClicked} text = 'Good' />
       <Button action = {badClicked} text = 'bad' />
       <Button action = {neutralClicked} text = 'neutral' />
+
       <br/><br/><br/><br/>
+
       <h2>Statistics</h2>
       <Display number = {good} text = 'Good'/>
       <Display number = {bad} text = 'bad'/>
       <Display number = {neutral} text = 'neutral'/>
+      <Display number = {bad + neutral + good} text = 'All'/>
+      <Display number = {(bad*-1 + good)/10} text = 'Average'/>
+      <DisplayPerccent good = {good} bad = {bad} neutral = {neutral}/> 
+
     </div>
   )  
 }
