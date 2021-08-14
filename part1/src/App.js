@@ -1,59 +1,38 @@
-import React from 'react'
+import React, { useState } from 'react'
+
+const Button = ({action , text}) =>{
+    return(
+      <button onClick = {action}>{text}</button>
+    )  
+}
+
+const Display = ({number , text}) => <div>{text}s : {number}</div>
 
 const App = () => {
-  
-  const course = {
- 
-    name : 'Half Stack application development',
+  const [good , setGood] = useState(0);
+  const [bad , setBad] = useState(0);
+  const [neutral, setNeutral] = useState(0);
 
-    parts : [
-   {
-    name : 'Fundamentals of React',
-    exercises : 10
-   },
-   {
-    name : 'Using props to pass data',
-    exercises :7 
-   },
-   {
-    name :'State of a component',
-    exercises :14 
-   }
-  ]
-}
-    return (
-    <div>
-      <Header name={course}/>
-      <Content course ={course}/>
-      <Total course={course}/>
-    </div>
-  )
-}
+  const goodClicked = () => setGood(good +1)
+  const badClicked = () => setBad(bad +1 )
+  const neutralClicked = () => setNeutral(neutral+1)
 
-const Header = (props) =>{
-  return(
-    <h1>
-      {props.name.name}
-    </h1>
-  )
-}
-const Content = (props) => {
+
+
+
   return(
     <div>
-      <p>{props.course.parts[0].name}  {props.course.parts[0].exercises}</p>
-      <p>{props.course.parts[1].name}  {props.course.parts[1].exercises}</p>
-      <p>{props.course.parts[2].name}  {props.course.parts[2].exercises}</p>
+      <h1>Give Feedback</h1>
+      <Button action = {goodClicked} text = 'Good' />
+      <Button action = {badClicked} text = 'bad' />
+      <Button action = {neutralClicked} text = 'neutral' />
+      <br/><br/><br/><br/>
+      <h2>Statistics</h2>
+      <Display number = {good} text = 'Good'/>
+      <Display number = {bad} text = 'bad'/>
+      <Display number = {neutral} text = 'neutral'/>
     </div>
-  )
-}
-const Total = (props) => {
-  
-    return(
-      <div>
-        <p>Number of exercises {props.course.parts[0].exercises + 
-        props.course.parts[1].exercises + props.course.parts[2].exercises}</p>
-      </div>
-    )
+  )  
 }
 
 export default App
