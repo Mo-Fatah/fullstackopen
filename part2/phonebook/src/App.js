@@ -2,23 +2,25 @@ import React, { useEffect, useState } from 'react';
 import Display from './Components/Display';
 import PersonForm from './Components/PersonForm';
 import Filter from './Components/Filter';
-import axios from 'axios';
-
+import personDB from './services/personsDB';
 
 const App = () => {
   const [allPersons, setAllPersons] = useState([]);
-  const [persons , setPersons] = useState([]);
   const [newName , setNewName] = useState('');
   const [newNumber , setNewNumber] = useState('');
   const [newFilter , setNewFilter] = useState('');
 
-  useEffect(() =>
+  /*useEffect(() =>
     axios
         .get("http://localhost:3001/persons")
         .then(response =>{
             setAllPersons(response.data);
         })
-  ,[])  
+  ,[])*/
+  
+useEffect(() =>{
+  personDB.getAll().then(data => setAllPersons(data));
+}, [])
   
 
   const handleInputName = (event) =>{
@@ -30,31 +32,48 @@ const App = () => {
   }
 
   const addNote = (event) =>{
+
     event.preventDefault()
+
     if(newName.length < 1 || newNumber.length < 1) return
-    if(allPersons.filter(person => person.name === newName).length > 0){
-      window.alert(`${newName} already exists`)
-      return;
+    
+    const repeated = allPersons.filter(person => person.name === newName);
+    if(repeated.length > 0){
+        if(window.confirm(`${newName} already exists. Do you want to replace the old number with the new one ?`)){
+          const updatedNumber = {...repeated[0] , number : newNumber}
+          personDB.update(updatedNumber)
+          .then(response =>{
+            setAllPersons(allPersons.map(person =>
+              person.id == response.id ? response : person
+            ))
+          })
+
+        }
+        return
     }
+
     const newObj = {
         name : newName,
         number : newNumber,
-        id : allPersons.length+1
+        id : allPersons.reduce((t,person) => Math.max(person.id, t),0) +1
     }
-    setAllPersons(allPersons.concat(newObj))
+    personDB.create(newObj).then(response => {
+      setAllPersons(allPersons.concat(response));
+    })
     setNewName(''); 
-    setNewNumber('')
+    setNewNumber('');
+
+  }
+
+  const handleDeletePerson = (id) =>{
+    setAllPersons(allPersons.filter(
+      person=> person.id != id
+    ))
   }
   
 
   const handleNewFilter = (event) =>{
     setNewFilter(event.target.value)
-    console.log(newFilter);
-    const filtered =  allPersons.filter(person => person.name.includes(newFilter));
-    console.log(filtered);
-    console.log(filtered.length);
-    setPersons(filtered);
-
   }
 
   return (
@@ -70,8 +89,8 @@ const App = () => {
      <h2>Numbers</h2>
       <div>
         <ul>
-          <Display persons = {persons} allpersons = {allPersons} newFilter 
-              = {newFilter}/> 
+          <Display allpersons = {allPersons} newFilter 
+              = {newFilter} handleDeletePerson ={handleDeletePerson}/> 
         </ul>
       </div>
     </div>
