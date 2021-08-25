@@ -3,12 +3,14 @@ import Display from './Components/Display';
 import PersonForm from './Components/PersonForm';
 import Filter from './Components/Filter';
 import personDB from './services/personsDB';
+import Notification from './Components/Notification';
 
 const App = () => {
   const [allPersons, setAllPersons] = useState([]);
   const [newName , setNewName] = useState('');
   const [newNumber , setNewNumber] = useState('');
   const [newFilter , setNewFilter] = useState('');
+  const [notification , setNotification] = useState(null);
 
   /*useEffect(() =>
     axios
@@ -30,6 +32,13 @@ useEffect(() =>{
   const handleInputNum = (event) =>{
     setNewNumber(event.target.value);
   }
+  
+  const handleNotification = message =>{
+    setNotification(message);
+    setTimeout(() => {
+      setNotification(null)
+    }, 5000);
+  }
 
   const addNote = (event) =>{
 
@@ -38,14 +47,19 @@ useEffect(() =>{
     if(newName.length < 1 || newNumber.length < 1) return
     
     const repeated = allPersons.filter(person => person.name === newName);
+
     if(repeated.length > 0){
         if(window.confirm(`${newName} already exists. Do you want to replace the old number with the new one ?`)){
           const updatedNumber = {...repeated[0] , number : newNumber}
+
           personDB.update(updatedNumber)
           .then(response =>{
             setAllPersons(allPersons.map(person =>
               person.id == response.id ? response : person
             ))
+            handleNotification(
+              `${response.name} updated Successfully`
+            )
           })
 
         }
@@ -59,6 +73,8 @@ useEffect(() =>{
     }
     personDB.create(newObj).then(response => {
       setAllPersons(allPersons.concat(response));
+      handleNotification(`${response.name} Added Successfully`) 
+
     })
     setNewName(''); 
     setNewNumber('');
@@ -66,9 +82,11 @@ useEffect(() =>{
   }
 
   const handleDeletePerson = (id) =>{
+    
     setAllPersons(allPersons.filter(
       person=> person.id != id
     ))
+
   }
   
 
@@ -80,6 +98,7 @@ useEffect(() =>{
     <div>
 
       <h2>PhoneBook</h2>
+      <Notification message = {notification} />
       <Filter msg = 'Filter shown with' value = {newFilter} onChange={handleNewFilter}/>
 
       <PersonForm onSubmit = {addNote} newName = {newName}
