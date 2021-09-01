@@ -1,12 +1,14 @@
+require('dotenv').config();
 const express = require('express');
 const app = express() ;
 const morgan = require('morgan');
 const cors = require('cors');
+const Person = require('./models/person');
 
+app.use(express.static('build'))
 app.use(cors());
 app.use(express.json());
 app.use(morgan('tiny'));
-app.use(express.static('build'))
 morgan.token('customized', (req , resp) =>{
     return JSON.stringify(req.body);
 })
@@ -16,38 +18,36 @@ app.get('/', (request, response) =>{
     response.send("<h1>HelloWorld</h1>")
 })
 
-app.get('/api/persons' , (request , response) =>{
-    response.json(persons);
+app.get('/api/persons' , (request , response ,next) =>{
+    console.log('routed in get ');
+    Person.find({}).then(persons =>{
+        
+        response.json(persons);
+    }).catch(err => next(err))
 })
 
 app.get('/info' , (request , response) =>{
     const date = new Date();
-    response.send(`<h4>PhoneBook has info for ${persons.length}</h4>`
+    response.send(`<h4>PhoneBook has info for </h4>`
     + date.toString());
 })
 
-app.get('/api/persons/:id' , (request , response) =>{
-    const id = Number(request.params.id);
-    const person = persons.find(p => p.id === id);
-    if(person){
-        response.json(person);
-    }
-    else{
-        response.statusMessage = "couldn't find person"
-        response.status(404).send("<p>the person you requested not found</p>");
-    }
+app.get('/api/persons/:id' , (request , response , next) =>{
+    const id = request.params.id;
+    Person.findById(id).then(person =>{
+        response.json(person)
+    }).catch(err => next(err))
 })
 
-app.delete('/api/persons/:id', (request, response) =>{
-    const id = Number(request.params.id);
-    persons = persons.filter(n => n.id !== id);
-    response.status(204).end();
+app.delete('/api/persons/:id', (request, response , next) =>{
+    Person.findByIdAndDelete(request.params.id).then(result=>{
+        response.status(204).end()
+    }).catch(err => next(err));
 })
 
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :customized'));
+//app.use(morgan(':method :url :status :res[content-length] - :response-time ms :customized'));
 app.post('/api/persons' , (request, response) =>{
     console.log(request.body)
-    const id = generateID();
     const name = request.body.name;
     const number = request.body.number;
 
@@ -61,54 +61,46 @@ app.post('/api/persons' , (request, response) =>{
             error: "number is missing"
         })
     }
-    const findrepeated = persons.find(p => p.name === name);
-    if(findrepeated){
-        response.status(400).json({
-            error: "name already exits"
-        })
-    } 
-    person = {
-        id:id,
-        name : name,
-        number : Number(number)
-    }
-    persons = persons.concat(person);
-    response.json(person);
+     
+   const person = new Person({
+       name: name,
+       number: number
+   })
+   person.save().then(savedPerson=>{
+       response.json(savedPerson);
+       console.log("success : wrtie to DB ");
+   }).catch(err => console.log(err))
 })
 
 
-const PORT = process.env.PORT||3001;
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({
+      error: "unknown endpoint"
+    });
+  };
+app.use(unknownEndpoint)
+
+
+const errorHandler = (error , request , response , next) =>{
+    console.log(error.message);
+    if(error.name === "CastError" ){
+        return response.status(400).send({
+            error: "malformatted id"
+        })
+    }
+    next(error);
+}
+app.use(errorHandler);
+
+
+const PORT = process.env.PORT;
 app.listen(PORT , ()=> 
     console.log(`Server is running on port ${PORT}`))
 
-const generateID = () =>{
-    const max = 100000000000;
-    return Math.floor(Math.random()*max);
-}
 
 
 
 
 
-let persons = [
-    { 
-      "id": 1,
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": 2,
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": 3,
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": 4,
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-]
+
+
