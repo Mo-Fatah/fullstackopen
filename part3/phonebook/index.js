@@ -45,8 +45,42 @@ app.delete('/api/persons/:id', (request, response , next) =>{
     }).catch(err => next(err));
 })
 
+app.put('/api/persons/:id', (request , response , next) =>{
+    const newname = request.body.name;
+    const newnumber = request.body.number;
+    const id = request.params.id;
+
+    
+    const person = {
+        name: newname,
+        number: newnumber
+    }
+    Person.findByIdAndUpdate(id , person , {new : true})
+    .then(result=>{
+        response.json(result)
+    }).catch(err => next(err))
+    
+})
+
+/*
+app.put("/api/persons/:id", (request, response, next) => {
+    const body = request.body;
+  
+    const person = {
+      name: body.name,
+      number: body.number
+    };
+  
+    Person.findByIdAndUpdate(request.params.id, person, { new: true })
+      .then(updatedPerson => {
+        response.json(updatedPerson.toJSON());
+      })
+      .catch(error => next(error));
+  });
+  */
+
 //app.use(morgan(':method :url :status :res[content-length] - :response-time ms :customized'));
-app.post('/api/persons' , (request, response) =>{
+app.post('/api/persons' , (request, response, next) =>{
     console.log(request.body)
     const name = request.body.name;
     const number = request.body.number;
@@ -69,7 +103,7 @@ app.post('/api/persons' , (request, response) =>{
    person.save().then(savedPerson=>{
        response.json(savedPerson);
        console.log("success : wrtie to DB ");
-   }).catch(err => console.log(err))
+   }).catch(err => next(err))
 })
 
 
@@ -82,10 +116,14 @@ app.use(unknownEndpoint)
 
 
 const errorHandler = (error , request , response , next) =>{
-    console.log(error.message);
     if(error.name === "CastError" ){
         return response.status(400).send({
             error: "malformatted id"
+        })
+    }
+    if(error.name ==="ValidationError"){
+        return response.status(400).send({
+            error: error.message 
         })
     }
     next(error);
