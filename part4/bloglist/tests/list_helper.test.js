@@ -17,7 +17,7 @@ describe('total like', () => {
   });
 });
 
-describe('favoriteBlog' , () => {
+describe('favoriteBlog', () => {
   test('when list has only one blog', () => {
     const result = listhelper.favoriteBlog(listWithOneBlog);
     expect(result).toEqual(listWithOneBlog[0]);
@@ -35,7 +35,6 @@ describe('favoriteBlog' , () => {
     });
   });
 });
-
 
 const blogs = [
     {
