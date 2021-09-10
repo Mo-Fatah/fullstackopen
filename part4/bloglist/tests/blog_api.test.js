@@ -1,35 +1,23 @@
 const mongoose = require('mongoose');
 const supertest = require('supertest');
 const app = require('../app');
-
-const api = supertest(app);
+const blogHelper = require('./blogHelper');
 const Blog = require('../models/blog');
 
-const initialBlogs = [
-  {
-    title: 'initial title1',
-    author: 'mohamed',
-    url: '/.../.../',
-    likes: 24,
-  },
-  {
-    title: 'fullstack developer',
-    author: 'alien',
-    url: 'mars.universe',
-    likes: 1,
-  },
-];
+const api = supertest(app);
 
 beforeEach(async () => {
   await Blog.deleteMany({});
-  const blogObjects = initialBlogs.map((blog) => new Blog(blog));
+  const blogObjects = blogHelper.initialBlogs.map((blog) => new Blog(blog));
   const promiseArray = blogObjects.map((blog) => blog.save());
   await Promise.all(promiseArray);
 });
 
 test('all bloges existed', async () => {
   const response = await api.get('/api/blogs');
-  expect(response.body).toHaveLength(initialBlogs.length);
+  expect(response.body).toHaveLength(blogHelper.initialBlogs.length);
+  const titles = response.body.map((blog) => blog.title);
+  expect(titles).toContain('fullstack developer');
 });
 
 test('blogs are returned as json', async () => {
@@ -55,7 +43,7 @@ test('a blog is posted successfully', async () => {
   };
   await api.post('/api/blogs').send(newBlog);
   const result = await api.get('/api/blogs');
-  expect(result.body).toHaveLength(initialBlogs.length + 1);
+  expect(result.body).toHaveLength(blogHelper.initialBlogs.length + 1);
   const titleArray = result.body.map((blog) => blog.title);
   expect(titleArray).toContain(newBlog.title);
 });
@@ -65,6 +53,7 @@ test('if no likes added , likes is set to zero', async () => {
     title: 'no likes added',
     author: 'mohamed',
     url: 'mohamed@room',
+    user: '613bbd7985762e86eac7599b',
   };
   const result = await api.post('/api/blogs').send(newBlog);
   expect(result.body.likes).toBe(0);
@@ -116,7 +105,6 @@ test('successful update by id', async () => {
     .put(`/api/blogs/${updatedBlog.id}`)
     .send(updatedBlog)
     .expect(201);
-  
 
 })
 
