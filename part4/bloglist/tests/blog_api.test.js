@@ -33,11 +33,11 @@ test('all bloges existed', async () => {
 });
 
 test('blogs are returned as json', async () => {
-  await
-    api.get('/api/blogs')
+  await api
+    .get('/api/blogs')
     .expect(200)
     .expect('Content-type', /application\/json/);
-  });
+});
 
 test('all blogs have a defined id', async () => {
   const result = await api.get('/api/blogs');
