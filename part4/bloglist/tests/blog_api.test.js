@@ -53,7 +53,7 @@ test('if no likes added , likes is set to zero', async () => {
     title: 'no likes added',
     author: 'mohamed',
     url: 'mohamed@room',
-    user: '613bbd7985762e86eac7599b',
+    user: '613c4caee3d9391eeebf08d5',
   };
   const result = await api.post('/api/blogs').send(newBlog);
   expect(result.body.likes).toBe(0);
