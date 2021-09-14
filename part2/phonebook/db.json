@@ -1,16 +1,6 @@
 {
   "persons": [
     {
-      "name": "Ibrahim ",
-      "number": "1421523652",
-      "id": 2
-    },
-    {
-      "name": "Mohameddd",
-      "number": "121415523523",
-      "id": 3
-    },
-    {
       "name": "Ibrahim",
       "number": "12141552312414523",
       "id": 5
@@ -41,11 +31,6 @@
       "id": 11
     },
     {
-      "name": "eru",
-      "number": "werher",
-      "id": 12
-    },
-    {
       "name": "erhj",
       "number": "erjer",
       "id": 13
@@ -56,8 +41,8 @@
       "id": 14
     },
     {
-      "name": "rtj",
-      "number": "rtjkrty",
+      "name": "tryuio",
+      "number": "4568",
       "id": 15
     }
   ]

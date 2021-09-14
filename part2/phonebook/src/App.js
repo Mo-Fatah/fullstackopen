@@ -4,14 +4,14 @@ import PersonForm from './Components/PersonForm';
 import Filter from './Components/Filter';
 import personDB from './services/personsDB';
 import Notification from './Components/Notification';
-
+import ErrorMessage from './Components/ErrorMessage';
 const App = () => {
   const [allPersons, setAllPersons] = useState([]);
   const [newName , setNewName] = useState('');
   const [newNumber , setNewNumber] = useState('');
   const [newFilter , setNewFilter] = useState('');
   const [notification , setNotification] = useState(null);
-
+  const [errorMessage , setErrorMessage] = useState(null);
   /*useEffect(() =>
     axios
         .get("http://localhost:3001/persons")
@@ -40,11 +40,25 @@ useEffect(() =>{
     }, 5000);
   }
 
+  const handleErroMessage = message =>{
+    setErrorMessage(message);
+    setTimeout(()=>{
+      setErrorMessage(null)},3000
+      );
+  }
+
   const addNote = (event) =>{
 
     event.preventDefault()
 
-    if(newName.length < 1 || newNumber.length < 1) return
+    if(newName.length < 3 ){
+      handleErroMessage("Name should be at least 3 characters\n طلبك مرفوض يا نرم")
+      return
+    }
+    if(newNumber.length < 8 ){
+      handleErroMessage("Number should be at least 8 digits\n طلبك مرفوض يا نرم")
+      return
+    }  
     
     const repeated = allPersons.filter(person => person.name === newName);
 
@@ -99,6 +113,7 @@ useEffect(() =>{
 
       <h2>PhoneBook</h2>
       <Notification message = {notification} />
+      <ErrorMessage message = {errorMessage}/>
       <Filter msg = 'Filter shown with' value = {newFilter} onChange={handleNewFilter}/>
 
       <PersonForm onSubmit = {addNote} newName = {newName}

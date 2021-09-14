@@ -1,5 +1,5 @@
 
-const ErrorMessage = message =>{
+const ErrorMessage = ({message}) =>{
     if(message === null){
         return null;
     }
