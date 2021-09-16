@@ -1,3 +1,4 @@
+import userEvent from '@testing-library/user-event';
 import axios from 'axios'
 const baseUrl = '/api/blogs'
 
@@ -20,8 +21,27 @@ const create = async newBlog => {
   return response.data;
 }
 
+const addLike = async currBlog => {
+  currBlog.likes += 1;
+  currBlog.user = currBlog.user.id || currBlog.user
+  console.log(currBlog);
+  const response = await axios.put(`${baseUrl}/${currBlog.id}`, currBlog);
+  return response.data;
+} 
+
+const remove = async blog => {
+  const config = {
+    headers: {Authorization: token}
+  }
+  console.log(blog);
+  await axios.delete(`${baseUrl}/${blog.id}`, config)
+}
+
+
 export default { 
   getAll,
   create,
-  setToken
+  setToken,
+  addLike,
+  remove
 }

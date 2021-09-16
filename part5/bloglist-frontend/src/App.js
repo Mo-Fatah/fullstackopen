@@ -22,9 +22,10 @@ const App = () => {
   const [errorMessage, setErrorMessge] = useState(null)
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )  
+    blogService.getAll().then(blogs => {
+      blogs.sort((b1, b2) => b2.likes - b1.likes)
+      setBlogs( blogs)
+    })  
   }, [])
 
   useEffect(() => {
@@ -71,6 +72,7 @@ const App = () => {
                      handleLogout = {handleLogout}
                      newBlogForm = {newBlogForm}
                      blogs = {blogs}          
+                     setBlogs = {setBlogs}
           /> 
   }
 

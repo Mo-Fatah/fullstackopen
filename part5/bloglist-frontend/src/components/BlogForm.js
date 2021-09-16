@@ -5,6 +5,7 @@ const BlogForm = ({
   handleLogout,
   newBlogForm,
   blogs,
+  setBlogs,
 }) => {
   return (
     <div>  
@@ -13,7 +14,7 @@ const BlogForm = ({
       {newBlogForm()}
       <h2>blogs</h2>
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} setBlogs ={setBlogs} blogs ={blogs}/>
       )}
       <br/>
     </div>
