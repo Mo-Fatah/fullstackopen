@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 
 const LoginForm = ({
   handleLogin,
@@ -10,12 +10,12 @@ const LoginForm = ({
   return (
     <form onSubmit = {handleLogin}>
       <div>
-        Username  
+        Username
         <input
           type= "text"
           value = {username}
           name = "username"
-          onChange= {({target}) => setUsername(target.value)}
+          onChange= {({ target }) => setUsername(target.value)}
         />
       </div>
       <div>
@@ -23,8 +23,8 @@ const LoginForm = ({
         <input
           type= "text"
           value= {password}
-          name= "password" 
-          onChange={({target}) => setPassword(target.value)}
+          name= "password"
+          onChange={({ target }) => setPassword(target.value)}
         />
       </div>
       <button type= "submit">login</button>
@@ -32,4 +32,4 @@ const LoginForm = ({
   )
 }
 
-export default LoginForm;
+export default LoginForm

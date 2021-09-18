@@ -9,7 +9,6 @@ import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
 
 const App = () => {
-  
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -25,65 +24,67 @@ const App = () => {
     blogService.getAll().then(blogs => {
       blogs.sort((b1, b2) => b2.likes - b1.likes)
       setBlogs( blogs)
-    })  
+    })
   }, [])
 
   useEffect(() => {
-    const loggedUser = window.localStorage.getItem('loggedBlogAppUser');
+    const loggedUser = window.localStorage.getItem('loggedBlogAppUser')
     if (loggedUser) {
-      const user = JSON.parse(loggedUser); 
-      setUser(user);
-      blogService.setToken(user.token);
+      const user = JSON.parse(loggedUser)
+      setUser(user)
+      blogService.setToken(user.token)
     }
   }, [])
 
   const handleLogin = async (event) => {
-    event.preventDefault();
+    event.preventDefault()
     try {
-      const user = await loginService.login({username, password});
+      const user = await loginService.login({ username, password })
       blogService.setToken(user.token)
       window.localStorage.setItem(
         'loggedBlogAppUser', JSON.stringify(user)
       )
-      setUser(user);
-      setUsername('');
-      setPassword(''); 
-      console.log(user.token);
+      setUser(user)
+      setUsername('')
+      setPassword('')
+      console.log(user.token)
     } catch (exception) {
       setErrorMessge('Wrong Credentials')
       setTimeout(() => {
         setErrorMessge(null)
-      }, 5000) 
+      }, 5000)
     }
   }
 
   const loginForm = () => {
-     return <LoginForm handleLogin = {handleLogin}
-                       username = {username}
-                       setUsername = {setUsername}
-                       password = {password}
-                       setPassword = {setPassword}
+    return (
+      <LoginForm  handleLogin = {handleLogin}
+                  username = {username}
+                  setUsername = {setUsername}
+                  password = {password}
+                  setPassword = {setPassword}
             
-            /> 
+      />
+    )
   }
 
   const blogForm = () => {
     return <BlogForm user = {user}
                      handleLogout = {handleLogout}
                      newBlogForm = {newBlogForm}
-                     blogs = {blogs}          
+                     blogs = {blogs}
                      setBlogs = {setBlogs}
-          /> 
+          />
   }
 
   const handleLogout = (event) => {
-    event.preventDefault();
-    window.localStorage.removeItem('loggedBlogAppUser');
-    setUser(null);
+    event.preventDefault()
+    window.localStorage.removeItem('loggedBlogAppUser')
+    setUser(null)
   }
 
   const handleNewBlog = async (event) => {
-    event.preventDefault();
+    event.preventDefault()
     const newBlog = {
       title: blogTitle,
       author: blogAuthor,
@@ -91,7 +92,7 @@ const App = () => {
       likes: blogLikes
     }
 
-    const response = await blogService.create(newBlog);
+    await blogService.create(newBlog)
     setBlogAuthor('')
     setBlogLikes(0)
     setBlogTitle('')
@@ -100,7 +101,7 @@ const App = () => {
     setTimeout(() => {
       setMessage(null)
     }, 5000)
-    setBlogs(blogs.concat(newBlog)); 
+    setBlogs(blogs.concat(newBlog))
   }
 
 
@@ -119,10 +120,8 @@ const App = () => {
         />
       </Togglable>
     )
-           
   }
-  
-  
+
   return (
     <div>
       <ErrorMessage errorMessage={errorMessage}/>

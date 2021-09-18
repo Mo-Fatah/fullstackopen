@@ -1,7 +1,7 @@
-import React from "react"
-const Notification = ({message}) => {
-  if(message === null) 
-    return null;
+import React from 'react'
+const Notification = ({ message }) => {
+  if(message === null)
+    return null
 
   const notifStyle ={
     color: 'green',
@@ -14,9 +14,9 @@ const Notification = ({message}) => {
   }
 
   return(
-      <div style ={notifStyle}>
-          {message}
-      </div>
+    <div style ={notifStyle}>
+      {message}
+    </div>
   )
 
 }
