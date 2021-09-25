@@ -23,6 +23,7 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then(blogs => {
       blogs.sort((b1, b2) => b2.likes - b1.likes)
+      blogs.forEach(blog => blog.user = blog.user.id)
       setBlogs( blogs)
     })
   }, [])
@@ -101,6 +102,7 @@ const App = () => {
     setTimeout(() => {
       setMessage(null)
     }, 5000)
+    console.log(returnedBlog);
     setBlogs(blogs.concat(returnedBlog))
   }
 
