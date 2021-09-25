@@ -8,7 +8,7 @@ const BlogForm = ({
   setBlogs,
 }) => {
   return (
-    <div>  
+    <div>
       <h4>{user.username} logged in</h4>
       <button onClick = {handleLogout}>logout</button>
       {newBlogForm()}

@@ -16,14 +16,12 @@ const create = async newBlog => {
   const config = {
     headers: { Authorization: token }
   }
-  const response = await axios.post(baseUrl, newBlog,config);
+  const response = await axios.post(baseUrl, newBlog,config)
   return response.data
 }
 
 const addLike = async currBlog => {
   currBlog.likes += 1
-  currBlog.user = currBlog.user.id || currBlog.user
-  console.log(currBlog)
   const response = await axios.put(`${baseUrl}/${currBlog.id}`, currBlog);
   return response.data
 }

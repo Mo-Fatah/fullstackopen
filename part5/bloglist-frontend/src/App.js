@@ -92,7 +92,7 @@ const App = () => {
       likes: blogLikes
     }
 
-    await blogService.create(newBlog)
+    const returnedBlog = await blogService.create(newBlog)
     setBlogAuthor('')
     setBlogLikes(0)
     setBlogTitle('')
@@ -101,7 +101,7 @@ const App = () => {
     setTimeout(() => {
       setMessage(null)
     }, 5000)
-    setBlogs(blogs.concat(newBlog))
+    setBlogs(blogs.concat(returnedBlog))
   }
 
 
