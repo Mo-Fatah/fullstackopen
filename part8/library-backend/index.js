@@ -166,7 +166,6 @@ const resolvers = {
         }
         authors = authors.concat(author);
       }
-
       books = books.concat(book)
       return book
     },
