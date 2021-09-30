@@ -1,7 +1,53 @@
+require('dotenv').config()
+const mongoose = require('mongoose')
+const jwt = require('jsonwebtoken')
 const { ApolloServer, gql } = require('apollo-server')
-const { UniqueDirectiveNamesRule } = require('graphql')
-const {v1: uuid} = require('uuid')
-let authors = [
+const typeDefs = require('./typeDefs')
+const resolvers = require('./resolvers')
+const User = require('./models/user')
+
+const SECRET = process.env.SECRET
+
+mongoose.connect(process.env.MONGO_URI,{ useNewUrlParser: true, useUnifiedTopology: true,  })
+  .then(() => {
+    console.log("conntected to MongoDB");
+  })
+  .catch((error) => {
+    console.log("error connecting to mongoDB", error.message);
+  })
+
+const context = async ({req}) => {
+  const auth = req ? req.headers.authorization : null
+  if( auth && auth.toLowerCase().startsWith('bearer ') ) {
+    const decodedToken = jwt.verify(auth.substring(7),SECRET) 
+    const currentUser = User.findById(decodedToken.id)
+    
+    return { currentUser }
+  }
+}
+const query = async () => {
+  console.log(await User.find({}))
+}
+query()
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  context: async ({req}) => {
+    const auth = req ? req.headers.authorization : null
+    if( auth && auth.toLowerCase().startsWith('bearer ') ) {
+      const decodedToken = await jwt.verify(auth.substring(7),SECRET) 
+      const currentUser = await User.findById(decodedToken.id)
+      console.log(currentUser); 
+      return { currentUser }
+    }
+  }
+})
+
+server.listen().then(({ url }) => {
+  console.log(`Server ready at ${url}`)
+})
+
+/*let authors = [
   {
     name: 'Robert Martin',
     id: "afa51ab0-344d-11e9-a414-719c6709cf3e",
@@ -27,7 +73,7 @@ let authors = [
   },
 ]
 
-/*
+
  * Suomi:
  * Saattaisi olla järkevämpää assosioida kirja ja sen tekijä tallettamalla kirjan yhteyteen tekijän nimen sijaan tekijän id
  * Yksinkertaisuuden vuoksi tallennamme kuitenkin kirjan yhteyteen tekijän nimen
@@ -35,7 +81,7 @@ let authors = [
  * English:
  * It might make more sense to associate a book with its author by storing the author's name in the context of the book instead of the author's id
  * However, for simplicity, we will store the author's name in connection with the book
-*/
+
 
 let books = [
   {
@@ -88,108 +134,5 @@ let books = [
     genres: ['classic', 'revolution']
   },
 ]
-
-const typeDefs = gql`
-  type Query {
-    bookCount: Int!
-    authorsCount: Int!
-    findAuthor(name: String!): Author
-    findBook(title: String!): Book
-    allBooks: [Book!]!
-    allAuthors: [Author!]!
-    booksBy(author: String, genre: String):[Book!]
-  }
-
-  type Book {
-    title: String!
-    published: Int!
-    author: String!
-    id: ID!
-    genres: [String!]!
-  }
-
-  type Author {
-    name: String
-    id: ID!
-    born: Int 
-  }
-  type Mutation {
-    addBook(
-      title: String!
-      published: Int!
-      author: String!
-      genres: [String!]!
-    ): Book
-
-    editAuthor (name: String!, setBornTo: Int!): Author
-  }
-`
-
-const resolvers = {
-  Query: {
-    bookCount: () => books.length,
-    authorsCount: () => authors.length,
-    findAuthor: (root, args) => {
-      const author = authors.find(author => author.name === args.name)
-      return author
-    },
-    
-    findBook: (root, args) => {
-      const book = books.find(book => book.title === args.title)
-      return book
-    },
-    
-    allBooks: () => books,
-    allAuthors: () => authors,
-    
-    booksBy: (root, args) => {
-      if(args.author && args.genres) {
-        return books.filter(book => book.author === args.author &&
-          bokks.genres.includes(args.genre))
-      }
-      if(args.author){
-        return  books.filter(book => book.author === args.author)
-      }
-      if(args.genre) {
-        return books.filter(book => book.genres.includes(args.genre))
-      }
-    },
-  },
-
-  Mutation: {
-    addBook: (root, args) => {
-      const book = {...args, id: uuid()}
-      if (!authors.includes(book.author)){
-        const author = {
-          name: book.author,
-          id: uuid()
-        }
-        authors = authors.concat(author);
-      }
-      books = books.concat(book)
-      return book
-    },
-
-    editAuthor: (root, args) => {
-      const author = authors.find(author => author.name === args.name)
-      if (!author) return null;
-
-      const newAuthor = {
-        ...author,
-        born: args.setBornTo
-      }
-      authors = authors.map(auth => auth.name === newAuthor.name ? newAuthor : auth)
-      return newAuthor
-    } 
-  }
-}
-
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-})
-
-server.listen().then(({ url }) => {
-  console.log(`Server ready at ${url}`)
-})
+*/
 

@@ -10,7 +10,13 @@
   "license": "ISC",
   "dependencies": {
     "apollo-server": "^3.3.0",
+    "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
     "graphql": "^15.6.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.0.8",
+    "mongoose-unique-validator": "^2.0.3",
     "uuid": "^8.3.2"
   }
 }
