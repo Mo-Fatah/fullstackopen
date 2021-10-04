@@ -4,9 +4,8 @@ const { UserInputError, AuthenticationError } = require('apollo-server-errors')
 const User = require('./models/user')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const books = []
-const authors = [] 
-
+const { PubSub } = require('graphql-subscriptions')
+const pubSub = new PubSub()
 const resolvers = {
   Query: {
     bookCount: () => Book.collection.countDocuments(), 
@@ -21,10 +20,10 @@ const resolvers = {
       return book
     },
     
-    allBooks: async () => await Book.find({}),
+    allBooks: async () => await Book.find({}).populate('author'),
     allAuthors: async () => await Author.find({ }),
     
-    booksBy: (root, args) => {
+    /*booksBy: (root, args) => {
       if(args.author && args.genres) {
         return books.filter(book => book.author === args.author &&
           bokks.genres.includes(args.genre))
@@ -35,7 +34,7 @@ const resolvers = {
       if(args.genre) {
         return books.filter(book => book.genres.includes(args.genre))
       }
-    },
+    },*/
 
     me: (root, args, context) => {
       return context.currentUser
@@ -63,6 +62,7 @@ const resolvers = {
         throw new UserInputError(error.message)
       } 
 
+      pubSub.publish('BOOK_ADDED', { bookAdded: newBook })
       return newBook
     },
 
@@ -104,6 +104,12 @@ const resolvers = {
       const token = jwt.sign(userForToken, process.env.SECRET)
       return {value: token}
     }   
+  },
+
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubSub.asyncIterator(['BOOK_ADDED']) 
+    }
   }
 }
 

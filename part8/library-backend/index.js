@@ -4,9 +4,9 @@ const jwt = require('jsonwebtoken')
 const { ApolloServer, gql } = require('apollo-server')
 const typeDefs = require('./typeDefs')
 const resolvers = require('./resolvers')
-const User = require('./models/user')
-
+const Book = require('./models/book')
 const SECRET = process.env.SECRET
+const User = require('./models/user')
 
 mongoose.connect(process.env.MONGO_URI,{ useNewUrlParser: true, useUnifiedTopology: true,  })
   .then(() => {
@@ -26,7 +26,7 @@ const context = async ({req}) => {
   }
 }
 const query = async () => {
-  console.log(await User.find({}))
+  console.log(await Book.find({}))
 }
 query()
 const server = new ApolloServer({
@@ -35,16 +35,16 @@ const server = new ApolloServer({
   context: async ({req}) => {
     const auth = req ? req.headers.authorization : null
     if( auth && auth.toLowerCase().startsWith('bearer ') ) {
-      const decodedToken = await jwt.verify(auth.substring(7),SECRET) 
+      const decodedToken = jwt.verify(auth.substring(7),SECRET) 
       const currentUser = await User.findById(decodedToken.id)
-      console.log(currentUser); 
       return { currentUser }
     }
   }
 })
 
-server.listen().then(({ url }) => {
+server.listen().then(({ url, subscriptionsUrl }) => {
   console.log(`Server ready at ${url}`)
+  console.log(`Subscriptions ready at ${subscriptionsUrl}`)
 })
 
 /*let authors = [
